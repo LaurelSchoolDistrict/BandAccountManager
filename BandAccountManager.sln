@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BandAccountManager.BlazorAp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BandAccountManager.Infrastructure.MongoDB", "src\BandAccountManager.Infrastructure.MongoDB\BandAccountManager.Infrastructure.MongoDB.csproj", "{D0330E44-C379-4999-B05D-5406A7BCE538}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BandAccountManager.Shared", "src\BandAccountManager.Shared\BandAccountManager.Shared.csproj", "{1CD24B3C-353B-4760-8348-4A161C63C259}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,18 @@ Global
 		{D0330E44-C379-4999-B05D-5406A7BCE538}.Release|x64.Build.0 = Release|Any CPU
 		{D0330E44-C379-4999-B05D-5406A7BCE538}.Release|x86.ActiveCfg = Release|Any CPU
 		{D0330E44-C379-4999-B05D-5406A7BCE538}.Release|x86.Build.0 = Release|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Debug|x64.Build.0 = Debug|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Debug|x86.Build.0 = Debug|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Release|x64.ActiveCfg = Release|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Release|x64.Build.0 = Release|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Release|x86.ActiveCfg = Release|Any CPU
+		{1CD24B3C-353B-4760-8348-4A161C63C259}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -101,6 +115,7 @@ Global
 		{6180AF90-84B5-4498-BBEB-89A91ACA916C} = {DD79D29A-3265-4344-8657-0B3B628F3CD7}
 		{7B0D3E62-865F-4C02-9A04-BC6FC9A0AB64} = {DD79D29A-3265-4344-8657-0B3B628F3CD7}
 		{D0330E44-C379-4999-B05D-5406A7BCE538} = {C2E3DBA4-D400-4C61-A2CA-0A46307A1625}
+		{1CD24B3C-353B-4760-8348-4A161C63C259} = {C0043DDA-B669-4294-B93F-C4773F7B8428}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6F7405F8-093C-4953-896E-1CDFCB3DD174}
