@@ -27,7 +27,7 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(Policy = Permissions.Account.Write)]
+        [Authorize(Policy = Policies.Permissions.Account.Write)]
         [HttpPost]
         [Route("{accountId}/transactions")]
         public async Task<IActionResult> AddTransaction(string accountId, [FromBody]TransactionDto transactionDto)
@@ -36,7 +36,7 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
 
             if (account is null)
             {
-                return NotFound();
+                return NotFound($"Account {accountId} does not exist or you do not have permission to access it.");
             }
 
             account.Transactions.Add(_mapper.Map<Transaction>(transactionDto));
@@ -46,7 +46,7 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
             return Ok();
         }
 
-        [Authorize(Policy = Permissions.Account.Write)]
+        [Authorize(Policy = Policies.Permissions.Account.Write)]
         [HttpPost]
         [Route("")]
         public async Task<IActionResult> Create([FromBody]AccountDto accountDto)
@@ -55,7 +55,7 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
 
             if (existingAccount is not null)
             {
-                return Conflict();
+                return Conflict($"Account {accountDto.Id} already exists.");
             }
 
             await _accountRepository.Save(_mapper.Map<Account>(accountDto));
@@ -63,7 +63,7 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
             return Ok();
         }
 
-        [Authorize(Policy = Permissions.Account.Delete)]
+        [Authorize(Policy = Policies.Permissions.Account.Delete)]
         [HttpDelete]
         [Route("{accountId}")]
         public async Task Delete(string accountId)
@@ -71,7 +71,7 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
             await _accountRepository.Delete(accountId);
         }
 
-        [Authorize(Policy = Permissions.Account.DeleteTransaction)]
+        [Authorize(Policy = Policies.Permissions.Account.DeleteTransaction)]
         [HttpDelete]
         [Route("{accountId}/transactions/{transactionId}")]
         public async Task<IActionResult> DeleteTransaction(string accountId, string transactionId)
@@ -80,7 +80,7 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
 
             if (account is null)
             {
-                return NotFound();
+                return NotFound($"Account {accountId} does not exist or you do not have permission to access it.");
             }
 
             account.Transactions.RemoveAll(t => t.Id.Equals(transactionId));
@@ -90,7 +90,7 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
             return Ok();
         }
 
-        [Authorize(Policy = Permissions.Account.Read)]
+        [Authorize(Policy = Policies.Permissions.Account.Read)]
         [HttpGet]
         [Route("{accountId}")]
         public async Task<IActionResult> Get(string accountId)
@@ -99,7 +99,7 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
 
             if (account is null)
             {
-                return NotFound();
+                return NotFound($"Account {accountId} does not exist or you do not have permission to access it.");
             }
 
             return Ok(_mapper.Map<AccountDto>(account));
@@ -115,18 +115,18 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
 
             if (accounts.Count == 0)
             {
-                return NotFound();
+                return NotFound("An account for the current user could not be found.");
             }
 
             else if (accounts.Count > 1)
             {
-                return Conflict();
+                return Conflict("More than one account was found for the current user.");
             }
 
             return Ok(_mapper.Map<AccountDto>(accounts.First()));
         }
 
-        [Authorize(Policy = Permissions.Account.Read)]
+        [Authorize(Policy = Policies.Permissions.Account.Read)]
         [HttpGet]
         [Route("{accountId}/transactions")]
         public async Task<IActionResult> GetTransactions(string accountId)
@@ -135,13 +135,13 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
 
             if (account is null)
             {
-                return NotFound();
+                return NotFound($"Account {accountId} does not exist or you do not have permission to access it.");
             }
 
             return Ok(_mapper.Map<TransactionDto[]>(account.Transactions.OrderByDescending(t => t.DateEffective)));
         }
 
-        [Authorize(Policy = Permissions.Account.ReadAll)]
+        [Authorize(Policy = Policies.Permissions.Account.ReadAll)]
         [HttpGet]
         [Route("_search")]
         public async Task<AccountDto[]> Search(string query)
@@ -156,7 +156,7 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
             return _mapper.Map<AccountDto[]>(results);
         }
 
-        [Authorize(Policy = Permissions.Account.Write)]
+        [Authorize(Policy = Policies.Permissions.Account.Write)]
         [HttpPut]
         [Route("{accountId}")]
         public async Task<IActionResult> Update([FromBody]AccountDto accountDto)
@@ -165,7 +165,7 @@ namespace BandAccountManager.BlazorApp.Server.Controllers
 
             if (account is null)
             {
-                return NotFound();
+                return NotFound($"Account {accountDto.Id} does not exist or you do not have permission to access it.");
             }
 
             _mapper.Map(accountDto, account);

@@ -1,3 +1,6 @@
+using System;
+
+using BandAccountManager.BlazorApp.Shared.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -6,6 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using BandAccountManager.BlazorApp.Server.Authorization;
 
 namespace BandAccountManager.BlazorApp.Server
 {
@@ -22,6 +27,18 @@ namespace BandAccountManager.BlazorApp.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication().AddGoogle(options =>
+            {
+                Configuration.Bind("Authentication", options);
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Policies.DistrictUser, policy =>
+                {
+                    policy.RequireAssertion(context => context.User.FindFirst("email")?.Value.EndsWith("laurel.k12.pa.us", StringComparison.OrdinalIgnoreCase) ?? false);
+                });
+            }).AddTransient<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
