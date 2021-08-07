@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: band-account-manager
+  namespace: laurelschooldistrict
+  annotations:
+    github-actions/job-id: "#{RUN_ID}#"
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: band-account-manager
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: band-account-manager
+    spec:
+      imagePullSecrets:
+        - name: ghcr
+      containers:
+        - name: band-account-manager
+          image: "ghcr.io/laurelschooldistrict/band-account-manager:#{VERSION}#"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: 100m
+              memory: 256Mi
+          env:
+            - name: Auth0__ClientSecret
+              valueFrom:
+                secretKeyRef:
+                  name: band-account-manager
+                  key: auth0__clientsecret
+            - name: ConnectionStrings__MongoDB
+              valueFrom:
+                secretKeyRef:
+                  name: band-account-manager
+                  key: connectionstrings__mongodb
+            - name: DOTNET_ENVIRONMENT
+              value: Production

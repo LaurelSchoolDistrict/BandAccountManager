@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: band-account-manager
+  namespace: bodygenesis
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - my.spartan.band
+      secretName: my-spartan-band-tls
+  rules:
+    - host: my.spartan.band
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              serviceName: band-account-manager
+              servicePort: 80
