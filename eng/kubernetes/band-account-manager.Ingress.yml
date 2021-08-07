@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: band-account-manager
-  namespace: bodygenesis
+  namespace: laurelschooldistrict
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
