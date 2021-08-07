@@ -1,0 +1,60 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudForm @bind-IsValid="isValid">
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="12">
+                    <MudTextField T="string"
+                                  @bind-Value="newAccount.StudentName"
+                                  HelperText="The full name of the student on the account."
+                                  Immediate="true"
+                                  Label="Student Name"
+                                  Required="true" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string"
+                                  @bind-Value="newAccount.StudentEmail"
+                                  HelperText="The school email address of the student on the account."
+                                  Immediate="true"
+                                  Label="Student Email"
+                                  Required="true"
+                                  Validation="emailValidator.ValidateValueFunc" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudNumericField T="decimal"
+                                     @bind-Value="newAccount.StartingBalance"
+                                     Adornment="Adornment.Start"
+                                     AdornmentColor="Color.Default"
+                                     AdornmentText="$"
+                                     Format="N2"
+                                     HelperText="The current balance of the student's account."
+                                     Immediate="true"
+                                     Label="Starting Balance" />
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Class="mr-2" Color="Color.Default" OnClick="OnClickCancel" Variant="Variant.Text">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Disabled="!isValid" OnClick="OnClickAdd" Variant="Variant.Filled">Add Account</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code
+{
+    [CascadingParameter]
+    public MudDialogInstance? Dialog { get; set; }
+
+    bool isValid = false;
+    NewAccountDto newAccount = new();
+    FluentValueValidator<string> emailValidator = new(x => x.NotEmpty().EmailAddress());
+
+    void OnClickAdd()
+    {
+        Dialog?.Close(DialogResult.Ok(newAccount));
+    }
+
+    void OnClickCancel()
+    {
+        Dialog?.Cancel();
+    }
+}

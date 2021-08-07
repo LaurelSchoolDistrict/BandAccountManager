@@ -1,0 +1,65 @@
+﻿@using System.IO;
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12">
+                <InputFile id="inputFile" OnChange="OnInputFileChange" hidden />
+
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Filled.CloudUpload"
+                           for="inputFile">Choose File...</MudButton>
+            </MudItem>
+
+            @if (csvFile is not null)
+            {
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body1">@csvFile.Name</MudText>
+                </MudItem>
+            }
+
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Class="mr-2" Color="Color.Default" OnClick="OnClickCancel" Variant="Variant.Text">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Disabled="@(csvFile is null)" OnClick="OnClickUpload" Variant="Variant.Filled">Upload</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code
+{
+    [CascadingParameter]
+    public MudDialogInstance? Dialog { get; set; }
+
+    IBrowserFile? csvFile = null;
+
+    void OnClickCancel()
+    {
+        Dialog?.Cancel();
+    }
+
+    async Task OnClickUpload()
+    {
+        if (csvFile is null)
+        {
+            return;
+        }
+
+        using var browserFileStream = csvFile.OpenReadStream();
+
+        var memory = new MemoryStream((int)browserFileStream.Length);
+
+        await browserFileStream.CopyToAsync(memory);
+
+        memory.Seek(0, SeekOrigin.Begin);
+
+        Dialog?.Close(DialogResult.Ok(memory));
+    }
+
+    void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        csvFile = e.File;
+    }
+}

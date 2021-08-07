@@ -1,0 +1,13 @@
+﻿
+<MudText Color="color" Inline="true" Typo="Typo">@(Value?.ToString("c") ?? 0.ToString("c"))</MudText>
+
+@code
+{
+    [Parameter]
+    public Typo Typo { get; set; } = Typo.body1;
+
+    [Parameter]
+    public decimal? Value { get; set; }
+
+    Color color => (Value is null || Value >= 0) ? Color.Primary : Color.Error;
+}

@@ -1,0 +1,45 @@
+﻿@inherits LayoutComponentBase
+
+@inject NavigationManager _navigationManager
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudText Typo="Typo.h5" Class="ml-3">My Laurel Band Account</MudText>
+        <MudSpacer />
+        @if (user is not null)
+        {
+            <MudText Typo="Typo.body1" Class="mr-2">Signed in as @user?.Identity?.Name</MudText>
+        }
+        <MudTooltip Text="Sign Out">
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" OnClick="OnClickLogout" Color="Color.Inherit" />
+        </MudTooltip>
+    </MudAppBar>
+    <MudMainContent>
+        <MudContainer Class="pa-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code
+{
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    ClaimsPrincipal? user = null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (AuthenticationState is not null)
+        {
+            var authState = await AuthenticationState;
+
+            user = authState.User;
+        }
+    }
+
+    void OnClickLogout()
+    {
+        _navigationManager.NavigateTo("/authentication/logout");
+    }
+}

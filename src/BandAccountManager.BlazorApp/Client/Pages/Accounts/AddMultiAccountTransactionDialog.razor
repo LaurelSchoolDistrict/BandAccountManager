@@ -1,0 +1,70 @@
+﻿
+<MudDialog>
+    <DialogContent>
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12">
+                <AddTransactionFormPart Transaction="transaction" />
+            </MudItem>
+            <MudItem xs="12">
+                <div style="max-height:50vh;overflow-y:auto;">
+                    <AccountRefTable AllowSelections="true" LoadFunc="AccountRefLoadFunc" SelectedAccountRefsChanged="refs => selectedAccountRefs = refs" />
+                </div>
+            </MudItem>
+            <MudItem xs="12">
+                <MudSelect T="TransactionDistributionStrategyDto" HelperText="How would you like to distribute this transaction across the selected accounts?" Label="Distribution Strategy">
+                    <MudSelectItem Value="TransactionDistributionStrategyDto.DivideAcrossAccounts">Divide (<Currency Value="GetAmountPerAccount(transaction.Amount)" /> per account)</MudSelectItem>
+                    <MudSelectItem Value="TransactionDistributionStrategyDto.FixedAmountToAccounts">Fixed (<Currency Value="transaction.Amount" /> per account)</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Class="mr-2" Color="Color.Default" OnClick="OnClickCancel" Variant="Variant.Text">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="OnClickAddTransaction" Variant="Variant.Filled">Add Transaction</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code
+{
+    [CascadingParameter]
+    public MudDialogInstance? Dialog { get; set; }
+
+    [Parameter]
+    public Func<(int pageNumber, int pageSize), Task<IReadOnlyCollection<AccountRefDto>>>? AccountRefLoadFunc { get; set; }
+
+    TransactionDto transaction = new();
+    IReadOnlyList<AccountRefDto> selectedAccountRefs = Array.Empty<AccountRefDto>();
+
+    protected override void OnInitialized()
+    {
+        if (Dialog is null)
+        {
+            return;
+        }
+
+        Dialog.Options.FullWidth = true;
+        Dialog.Options.MaxWidth = MaxWidth.Large;
+
+        Dialog.SetOptions(Dialog.Options);
+    }
+
+    decimal GetAmountPerAccount(decimal amount)
+    {
+        if (selectedAccountRefs.Count == 0)
+        {
+            return 0;
+        }
+
+        return Math.Round(amount / selectedAccountRefs.Count, 2, MidpointRounding.ToZero);
+    }
+
+    void OnClickCancel()
+    {
+        Dialog?.Cancel();
+    }
+
+    void OnClickAddTransaction()
+    {
+        Dialog?.Close(DialogResult.Ok(transaction));
+    }
+}
