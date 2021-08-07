@@ -1,0 +1,31 @@
+﻿
+<MudDialog>
+    <DialogContent>
+        <MudForm @bind-IsValid="isValid">
+            <AddTransactionFormPart Transaction="transaction" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Class="mr-2" Color="Color.Default" OnClick="OnClickCancel" Variant="Variant.Text">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Disabled="!isValid" OnClick="OnClickAdd" Variant="Variant.Filled">Add Transaction</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code
+{
+    [CascadingParameter]
+    public MudDialogInstance? Dialog { get; set; }
+
+    TransactionDto transaction = new();
+    bool isValid = false;
+
+    void OnClickCancel()
+    {
+        Dialog?.Cancel();
+    }
+
+    void OnClickAdd()
+    {
+        Dialog?.Close(DialogResult.Ok(transaction));
+    }
+}

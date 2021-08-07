@@ -1,0 +1,27 @@
+﻿@page "/authentication/{action}"
+
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.Extensions.Configuration
+
+@inject NavigationManager _navigationManager
+@inject IConfiguration _configuration
+@inject IJSRuntime _jsRuntime
+
+<RemoteAuthenticatorView Action="@Action">
+    <LogOut>
+        @{
+            _jsRuntime.InvokeVoidAsync("sessionStorage.clear").AndForget();
+
+            var authority = _configuration["Authentication:Authority"];
+            var clientId = _configuration["Authentication:ClientId"];
+
+            _navigationManager.NavigateTo($"{authority}/v2/logout?client_id={clientId}");
+        }
+    </LogOut>
+</RemoteAuthenticatorView>
+
+@code
+{
+    [Parameter]
+    public string Action { get; set; } = string.Empty;
+}

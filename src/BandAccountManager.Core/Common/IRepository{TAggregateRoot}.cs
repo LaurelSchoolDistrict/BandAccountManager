@@ -9,6 +9,7 @@ namespace BandAccountManager.Core.Common
         where TAggregateRoot : IAggregateRoot
     {
         ValueTask Delete(string id);
+        Task<bool> Exists(string id);
         Task<TAggregateRoot?> Get(string id);
         Task<IReadOnlyCollection<TAggregateRoot>> Query(RepositoryQuery<TAggregateRoot> query, int skip = 0, int take = int.MaxValue);
         ValueTask Save(TAggregateRoot aggregate);

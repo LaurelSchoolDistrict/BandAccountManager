@@ -1,9 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="10.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="5.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BandAccountManager.Shared\BandAccountManager.Shared.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />

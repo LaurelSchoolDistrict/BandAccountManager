@@ -9,12 +9,10 @@ namespace BandAccountManager.BlazorApp.Server.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<Account, AccountDto>();
-            CreateMap<AccountDto, Account>();
-            CreateMap<AccountUser, AccountUserDto>();
-            CreateMap<AccountUserDto, AccountUser>();
-            CreateMap<Transaction, TransactionDto>();
-            CreateMap<TransactionDto, Transaction>();
+            CreateMap<Account, AccountDto>().ReverseMap();
+            CreateMap<Account, AccountRefDto>();
+            CreateMap<NewAccountDto, Account>();
+            CreateMap<Transaction, TransactionDto>().ReverseMap();
         }
     }
 }

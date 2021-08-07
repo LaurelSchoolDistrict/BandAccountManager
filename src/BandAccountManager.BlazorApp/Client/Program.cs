@@ -10,6 +10,8 @@ using MudBlazor;
 using MudBlazor.Services;
 
 using BandAccountManager.BlazorApp.Client.Services;
+using BandAccountManager.BlazorApp.Shared.Authorization;
+using BandAccountManager.BlazorApp.Client.Authentication;
 
 namespace BandAccountManager.BlazorApp.Client
 {
@@ -22,7 +24,16 @@ namespace BandAccountManager.BlazorApp.Client
 
             builder.Services.AddOidcAuthentication(options =>
             {
-                builder.Configuration.Bind("Authentication", options);
+                builder.Configuration.Bind("Authentication", options.ProviderOptions);
+
+                options.UserOptions.NameClaim = "name";
+                options.UserOptions.RoleClaim = "https://my.spartan.band/role";
+            }).AddAccountClaimsPrincipalFactory<CustomUserFactory>();
+
+            builder.Services.AddAuthorizationCore(options =>
+            {
+                options.AddPolicy(Roles.Administrator, Roles.PolicyImplementations.AdministratorPolicy);
+                options.AddPolicy(Roles.Teacher, Roles.PolicyImplementations.TeacherPolicy);
             });
 
             builder.Services.AddMudServices(options =>

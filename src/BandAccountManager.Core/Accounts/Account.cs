@@ -6,13 +6,20 @@ using BandAccountManager.Core.Common;
 
 namespace BandAccountManager.Core.Accounts
 {
-    public class Account : AggregateRootBase
+    public class Account : BaseEntity, IAggregateRoot
     {
-        public AccountUser? Student { get; set; }
-        public List<AccountUser> Parents { get; set; } = new List<AccountUser>();
-        public List<Transaction> Transactions { get; set; } = new List<Transaction>();
+        public string StudentName { get; set; } = string.Empty;
+        public string StudentEmail { get; set; } = string.Empty;
+        public int StudentGraduationYear { get; set; }
+        public List<string> ParentEmails { get; set; } = new();
+        public List<Transaction> Transactions { get; set; } = new();
 
-        public decimal Balance => (StartingBalance + Transactions.Sum(t => t.Amount));
+        public decimal Balance => (StartingBalance + Transactions
+            .Where(t => t.DateEffective.UtcDateTime <= DateTimeOffset.UtcNow)
+            .Sum(t => t.Amount));
+
         public decimal StartingBalance { get; set; }
+        public DateTimeOffset? LastTransactionDate => Transactions.Any() ? Transactions.OrderByDescending(t => t.DateEffective).First().DateEffective : null;
+        public decimal? LastTransactionAmount => Transactions.Any() ? Transactions.OrderByDescending(t => t.DateEffective).First().Amount : null;
     }
 }

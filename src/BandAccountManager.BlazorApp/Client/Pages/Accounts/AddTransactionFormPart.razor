@@ -1,0 +1,91 @@
+﻿
+<MudGrid Justify="Justify.Center">
+
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5">@(deposit ? "New Deposit" : "New Withdrawal")</MudText>
+    </MudItem>
+
+    <MudItem xs="12">
+        <div class="d-flex align-center">
+            <div class="flex-grow-1">
+                <MudNumericField T="decimal"
+                                 Adornment="Adornment.Start"
+                                 AdornmentText="$"
+                                 Format="N2"
+                                 HelperText="@($"The amount of money to {(deposit ? "deposit" : "withdraw")}.")"
+                                 Immediate="true"
+                                 Label="Amount"
+                                 Required="true"
+                                 Value="Transaction.Amount"
+                                 ValueChanged="AmountChanged" />
+            </div>
+            <div class="mx-4" style="text-align:center;">
+                <MudText Class="d-block" Typo="Typo.caption">Deposit/Withdrawal</MudText>
+                <MudToggleIconButton Color="Color.Error"
+                                     Icon="@Icons.Material.Filled.CallMade"
+                                     Toggled="deposit"
+                                     ToggledChanged="DepositToggledChanged"
+                                     ToggledColor="Color.Success"
+                                     ToggledIcon="@Icons.Material.Filled.CallReceived" />
+            </div>
+        </div>
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudTextField T="string"
+                      @bind-Value="Transaction.Note"
+                      HelperText="A short note describing the transaction. This is visible to students and parents."
+                      Immediate="true"
+                      Label="Note"
+                      Required="false" />
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudDatePicker Date="Transaction.DateEffective.LocalDateTime"
+                       DateChanged="DateChanged"
+                       HelperText="The date the transaction should take effect."
+                       Label="Date Effective"
+                       MaxDate="DateTime.Now.AddMonths(1)"
+                       MinDate="DateTime.Now.AddMonths(-1)"
+                       Required="false" />
+    </MudItem>
+
+</MudGrid>
+
+@code
+{
+    [Parameter]
+    public TransactionDto Transaction { get; set; } = new();
+
+    bool deposit = true;
+
+    void AmountChanged(decimal amount)
+    {
+        Transaction.Amount = amount;
+
+        UpdateTrueAmount();
+    }
+
+    void DateChanged(DateTime? dateTime)
+    {
+        Transaction.DateEffective = new(dateTime ?? DateTime.Now, DateTimeOffset.Now.Offset);
+    }
+
+    void DepositToggledChanged(bool toggled)
+    {
+        deposit = toggled;
+
+        UpdateTrueAmount();
+    }
+
+    void UpdateTrueAmount()
+    {
+        var currentAmount = Transaction.Amount;
+        var trueAmount = deposit ? Math.Abs(Transaction.Amount) : (Math.Abs(Transaction.Amount) * -1);
+
+        if (currentAmount != trueAmount)
+        {
+            Transaction.Amount = trueAmount;
+        }
+    }
+}

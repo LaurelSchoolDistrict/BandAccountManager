@@ -4,9 +4,8 @@ using BandAccountManager.Core.Common;
 
 namespace BandAccountManager.Core.Accounts
 {
-    public class Transaction : IEntity
+    public class Transaction : BaseEntity
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
         public DateTimeOffset DateEntered { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset DateEffective { get; set; } = DateTimeOffset.UtcNow;
         public decimal Amount { get; set; }

@@ -1,0 +1,15 @@
+﻿@inject NavigationManager _navigationManager
+
+@code
+{
+    [Parameter]
+    public string Uri { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool ForceLoad { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _navigationManager.NavigateTo(Uri, ForceLoad);
+    }
+}

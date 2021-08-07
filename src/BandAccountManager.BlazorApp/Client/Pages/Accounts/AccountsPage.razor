@@ -1,0 +1,129 @@
+﻿@page "/accounts"
+
+@using System.IO;
+
+@inject IDialogService _dialogService 
+@inject AccountsApiClient _accountsApiClient
+
+<MudGrid Justify="Justify.Center">
+    @if (accountRefTable is not null && !accountRefTable.Loading && accountRefTable.AccountRefs.Count == 0)
+    {
+        <MudItem xs="12">
+            <MudText Align="Align.Center" Typo="Typo.body1">It looks like you don't have access to any accounts! Check with Mr. Croach for more information.</MudText>
+        </MudItem>
+    }
+
+    else if (accountRefTable is not null && !accountRefTable.Loading && accountRefTable.AccountRefs.Count == 1 && !(user?.IsInRole(Roles.Administrator) ?? false) && (!user?.IsInRole(Roles.Teacher) ?? false))
+    {
+        <Redirect Uri="@($"/accounts/{accountRefTable.AccountRefs.First().Id}")" />
+    }
+
+    else
+    {
+        <MudItem xs="12">
+           <AccountRefTable @ref="accountRefTable" LoadFunc="loadAccountRefsFunc" ShowLastTransactionInfo="true" />
+        </MudItem>
+    }
+</MudGrid>
+
+<AuthorizeView Policy="@Roles.Teacher">
+    <div @onmouseover="() => fabHover = true" @onmouseleave="() => fabHover = false" class="d-flex flex-column align-center pa-4" style="position:fixed;bottom:0;right:0;">
+        @if (fabHover)
+        {
+            <MudTooltip Class="mt-4" Placement="Placement.Left" Text="Account">
+                <MudFab Class="my-2" Color="Color.Default" Icon="@Icons.Material.Filled.Person" OnClick="OnClickAddAccount" Size="Size.Small" />
+            </MudTooltip>
+
+            @if (context.User.IsInRole(Roles.Administrator))
+            {
+                <MudTooltip Class="mt-4" Placement="Placement.Left" Text="Bulk Account Upload">
+                    <MudFab Class="my-2" Color="Color.Default" Icon="@Icons.Material.Filled.People" OnClick="OnClickBulkAccountUpload" Size="Size.Small" />
+                </MudTooltip>
+            }
+
+            @if (false)
+            {
+                <MudTooltip Class="mt-4" Placement="Placement.Left" Text="Multi-Account Transaction">
+                    <MudFab Class="my-2" Color="Color.Default" Icon="@Icons.Material.Filled.AttachMoney" OnClick="OnClickAddMultiAccountTransaction" Size="Size.Small" />
+                </MudTooltip>
+            }
+
+        }
+        <MudFab Class="mt-2" Color="Color.Primary" Icon="@Icons.Material.Filled.Add" />
+    </div>
+</AuthorizeView>
+
+
+@code
+{
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    AccountRefTable? accountRefTable = null;
+    ClaimsPrincipal? user = null;
+    bool fabHover = false;
+    Func<(int pageNumber, int pageSize), Task<IReadOnlyCollection<AccountRefDto>>> loadAccountRefsFunc => new(LoadAccountRefs);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (AuthenticationState is not null)
+        {
+            var authState = await AuthenticationState;
+
+            user = authState.User;
+        }
+    }
+
+    async Task<IReadOnlyCollection<AccountRefDto>> LoadAccountRefs((int pageNumber, int pageSize) pagingInfo)
+    {
+        return await _accountsApiClient.GetAll(pagingInfo.pageNumber, pagingInfo.pageSize);
+    }
+
+    async Task OnClickAddAccount()
+    {
+        var dialogRef = _dialogService.Show<AddAccountDialog>();
+        var dialogResult = await dialogRef.Result;
+
+        if (dialogResult.Cancelled)
+        {
+            return;
+        }
+
+        var newAccount = (NewAccountDto)dialogResult.Data;
+
+        await _accountsApiClient.Create(newAccount);
+
+        accountRefTable?.Reset();
+    }
+
+    async Task OnClickAddMultiAccountTransaction()
+    {
+        var dialogRef = _dialogService.Show<AddMultiAccountTransactionDialog>(string.Empty, parameters: new()
+        {
+            { nameof(AddMultiAccountTransactionDialog.AccountRefLoadFunc), loadAccountRefsFunc }
+        });
+        var dialogResult = await dialogRef.Result;
+
+        if (dialogResult.Cancelled)
+        {
+            return;
+        }
+    }
+
+    async Task OnClickBulkAccountUpload()
+    {
+        var dialogRef = _dialogService.Show<BulkAccountUploadDialog>();
+
+        var dialogResult = await dialogRef.Result;
+
+        if (dialogResult.Cancelled)
+        {
+            return;
+        }
+
+        var csvFile = (Stream)dialogResult.Data;
+
+        await _accountsApiClient.ImportCsv(csvFile);
+    }
+}
+

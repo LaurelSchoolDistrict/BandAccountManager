@@ -1,0 +1,168 @@
+﻿
+<MudSimpleTable Hover="true" Striped="true">
+    <thead>
+        <tr>
+            @if (AllowSelections)
+            {
+                <th>&nbsp;</th>
+            }
+
+            <th>Student</th>
+            <th>Current Balance</th>
+
+            @if (ShowLastTransactionInfo)
+            {
+                <th>Last Transaction Date</th>
+                <th>Last Transaction Amount</th>
+            }
+
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var accountRef in accountRefs)
+        {
+            <tr>
+                @if (AllowSelections)
+                {
+                    <td>
+                        <MudCheckBox T="bool" Checked="Checked(accountRef)" CheckedChanged="c => CheckedChanged(accountRef, c)" />
+                    </td>
+                }
+
+                <td>
+                    <MudLink Href="@($"/accounts/{accountRef.Id}")">@accountRef.StudentName</MudLink>
+                </td>
+                <td>
+                    <Currency Value="accountRef.Balance" />
+                </td>
+
+                @if (ShowLastTransactionInfo)
+                {
+                    <td>@accountRef.LastTransactionDate?.LocalDateTime.ToShortDateString()</td>
+                    <td>
+                        <Currency Value="accountRef.LastTransactionAmount" />
+                    </td>
+                }
+                
+            </tr>
+        }
+
+        @if (loading)
+        {
+            <tr>
+                <td colspan="5">
+                    <div class="d-flex justify-center">
+                        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                    </div>
+                </td>
+            </tr>
+        }
+
+        else if (expectMoreData)
+        {
+            <tr>
+                <td colspan="5">
+                    <div class="d-flex justify-center">
+                        <MudButton Color="Color.Primary" OnClick="OnClickLoadMore" Variant="Variant.Text">Load More</MudButton>
+                    </div>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</MudSimpleTable>
+
+@code
+{
+    [Parameter]
+    public bool AllowSelections { get; set; }
+
+    [Parameter]
+    public Func<(int pageNumber, int pageSize), Task<IReadOnlyCollection<AccountRefDto>>>? LoadFunc { get; set; }
+
+    [Parameter]
+    public EventCallback<IReadOnlyList<AccountRefDto>> SelectedAccountRefsChanged { get; set; }
+
+    [Parameter]
+    public bool ShowLastTransactionInfo { get; set; }
+
+    public IReadOnlyList<AccountRefDto> AccountRefs => accountRefs;
+    public bool Loading => loading;
+
+    public void Reset()
+    {
+        accountRefs.Clear();
+
+        pageNumber = 1;
+
+        LoadPage().AndForget();
+    }
+
+    List<AccountRefDto> accountRefs = new();
+    List<AccountRefDto> selectedAccountRefs = new();
+    bool fabHover = false;
+    bool expectMoreData = true;
+    bool loading = false;
+    int pageNumber = 1;
+    int pageSize = 50;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPage();
+    }
+
+    bool Checked(AccountRefDto accountRef) => selectedAccountRefs.Contains(accountRef);
+
+    void CheckedChanged(AccountRefDto accountRef, bool isChecked)
+    {
+        if (isChecked && !selectedAccountRefs.Contains(accountRef))
+        {
+            selectedAccountRefs.Add(accountRef);
+        }
+
+        else if (!isChecked)
+        {
+            selectedAccountRefs.Remove(accountRef);
+        }
+
+        SelectedAccountRefsChanged.InvokeAsync(selectedAccountRefs).AndForget();
+    }
+
+    async Task OnClickLoadMore()
+    {
+        pageNumber++;
+
+        await LoadPage();
+    }
+
+    async Task LoadPage()
+    {
+        if (LoadFunc is null)
+        {
+            return;
+        }
+
+        loading = true;
+
+        StateHasChanged();
+
+        var results = await LoadFunc((pageNumber, pageSize));
+
+        if (pageNumber == 1)
+        {
+            accountRefs.Clear();
+
+            expectMoreData = true;
+        }
+
+        if (results.Count < pageSize)
+        {
+            expectMoreData = false;
+        }
+
+        accountRefs.AddRange(results);
+
+        loading = false;
+    }
+}

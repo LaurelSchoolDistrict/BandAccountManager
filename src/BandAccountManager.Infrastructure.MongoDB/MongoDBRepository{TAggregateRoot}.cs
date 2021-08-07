@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using MongoDB.Driver;
@@ -14,14 +12,21 @@ namespace BandAccountManager.Infrastructure.MongoDB
     {
         private readonly IMongoCollection<TAggregateRoot> _collection;
 
-        public MongoDBRepository(IMongoCollection<TAggregateRoot> collection)
+        public MongoDBRepository(MongoDBCollectionFactory mongoDbCollectionFactory)
         {
-            _collection = collection;
+            _collection = mongoDbCollectionFactory.Create<TAggregateRoot>();
         }
 
         public async ValueTask Delete(string id)
         {
             await _collection.DeleteOneAsync(ar => ar.Id.Equals(id));
+        }
+
+        public async Task<bool> Exists(string id)
+        {
+            var count = await _collection.CountDocumentsAsync(e => e.Id.Equals(id));
+
+            return (count > 0);
         }
 
         public async Task<TAggregateRoot?> Get(string id)

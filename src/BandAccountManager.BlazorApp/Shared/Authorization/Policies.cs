@@ -1,25 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Authorization;
 
 namespace BandAccountManager.BlazorApp.Shared.Authorization
 {
     public static class Policies
     {
-        public const string DistrictUser = "DistrictUser";
+        private static Lazy<AuthorizationPolicy> _administrator = new(() => Builders.Administrator.Build());
+        private static Lazy<AuthorizationPolicy> _teacher = new(() => Builders.Teacher.Build());
 
-        public static class Permissions
+        public static AuthorizationPolicy Administrator => _administrator.Value;
+        public static AuthorizationPolicy Teacher => _teacher.Value;
+
+        public static class Builders
         {
-            public static class Account
-            {
-                public const string Delete = "Permission.Account.Delete";
-                public const string DeleteTransaction = "Permission.Account.DeleteTransaction";
-                public const string Read = "Permission.Account.Read";
-                public const string ReadAll = "Permission.Account.ReadAll";
-                public const string Write = "Permission.Account.Write";
-            }
+            public static AuthorizationPolicyBuilder Administrator => new AuthorizationPolicyBuilder()
+                .RequireRole(Roles.Administrator);
+
+            public static AuthorizationPolicyBuilder Teacher => new AuthorizationPolicyBuilder()
+                .RequireRole(Roles.Administrator, Roles.Teacher);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace BandAccountManager.BlazorApp.Server
                 {
                     services
                         .AddAutoMapper(typeof(Program).Assembly)
-                        .AddMongoDBInfrastructure(context.Configuration.GetConnectionString("MongoDB"));
+                        .AddMongoDBInfrastructure(context.Configuration.GetConnectionString("MongoDB"), context.Configuration["MongoDB:DatabaseName"]);
                 });
     }
 }

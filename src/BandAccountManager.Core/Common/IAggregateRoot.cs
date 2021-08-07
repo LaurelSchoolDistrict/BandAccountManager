@@ -8,6 +8,5 @@ namespace BandAccountManager.Core.Common
 {
     public interface IAggregateRoot : IEntity
     {
-        public DateTimeOffset DateCreated { get; set; }
     }
 }
