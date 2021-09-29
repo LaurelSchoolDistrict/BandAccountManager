@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using BandAccountManager.BlazorApp.Shared.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using BandAccountManager.BlazorApp.Server.Authorization.Handlers;
+using BandAccountManager.BlazorApp.Shared.Authorization.Requirements;
 
 namespace BandAccountManager.BlazorApp.Server
 {
@@ -39,10 +42,15 @@ namespace BandAccountManager.BlazorApp.Server
 
             services.AddAuthorization(options =>
             {
+                options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+
                 options.AddPolicy(nameof(Policies.Administrator), Policies.Administrator);
                 options.AddPolicy(nameof(Policies.Teacher), Policies.Teacher);
-
             });
+
+            services.AddSingleton<IAuthorizationHandler, SameStudentAccountAuthorizationHandler>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();

@@ -53,7 +53,7 @@ namespace BandAccountManager.BlazorApp.Server.Api.Accounts
             int skip = (pageSize * (pageNumber - 1));
             int take = pageSize;
 
-            var userEmail = User.FindFirst("email")?.Value ?? string.Empty;
+            var userEmail = User.FindFirst("https://my.spartan.band/email")?.Value.ToLower() ?? string.Empty;
 
             // If the user is an admin or teacher, they can view all accounts and not just accounts they are assigned to.
             var authResult = await _authorizationService.AuthorizeAsync(User, Roles.Teacher);
@@ -74,7 +74,7 @@ namespace BandAccountManager.BlazorApp.Server.Api.Accounts
             {
                 accounts = await _accountRepository.Query(new RepositoryQuery<Account>
                 {
-                    FilterExpression = a => a.StudentEmail.Equals(userEmail) || a.ParentEmails.Contains(userEmail),
+                    FilterExpression = a => a.StudentEmail.ToLower() == userEmail || a.ParentEmails.Contains(userEmail),
                     SortDirection = QuerySortDirection.Ascending,
                     SortExpression = a => a.StudentName
                 }, skip, take);
