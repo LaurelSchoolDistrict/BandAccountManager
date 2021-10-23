@@ -27,6 +27,11 @@ spec:
               cpu: 100m
               memory: 256Mi
           env:
+            - name: Auth0__ClientSecret
+              valueFrom:
+                secretKeyRef:
+                  name: band-account-manager
+                  key: auth0__clientsecret
             - name: ConnectionStrings__MongoDB
               valueFrom:
                 secretKeyRef:

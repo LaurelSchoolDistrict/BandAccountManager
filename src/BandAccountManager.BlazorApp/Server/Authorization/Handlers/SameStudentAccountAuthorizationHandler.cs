@@ -13,7 +13,7 @@ namespace BandAccountManager.BlazorApp.Server.Authorization.Handlers
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, SameStudentRequirement requirement, Account resource)
         {
-            var userEmail = context.User.FindFirst("email")?.Value ?? string.Empty;
+            var userEmail = context.User.FindFirst("https://my.spartan.band/email")?.Value ?? string.Empty;
 
             if (resource.StudentEmail.Equals(userEmail, StringComparison.OrdinalIgnoreCase) || resource.ParentEmails.Contains(userEmail, StringComparer.OrdinalIgnoreCase))
             {
